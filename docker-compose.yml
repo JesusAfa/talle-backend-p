@@ -1,0 +1,14 @@
+version: "3.9"
+services:
+  microservicios:
+    container_name: microservicios
+    build: 
+      context: .
+      dockerfile: Dockerfile
+  nginx:
+    build: ./nginx
+    ports:
+      - 80:80
+    links:
+      - microservicios
+    restart: always
