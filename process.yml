@@ -3,7 +3,7 @@ apps:
     script: ./api/index.js
     instances: 1
     autorestart: true
-    exec_mode: 'fork'
+    exec_mode: 'cluster'
     watch: false
     env:
       NODE_ENV: development
@@ -13,7 +13,7 @@ apps:
     script: ./mysql/index-mysql.js
     instances: 1
     autorestart: true
-    exec_mode: 'fork'
+    exec_mode: 'cluster'
     watch: false
     env:
       NODE_ENV: development
@@ -23,7 +23,7 @@ apps:
     script: ./post/index-post.js
     instances: 1
     autorestart: true
-    exec_mode: 'fork'
+    exec_mode: 'cluster'
     watch: false
     env:
       NODE_ENV: development
