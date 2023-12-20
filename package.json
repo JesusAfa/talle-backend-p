@@ -4,6 +4,10 @@
   "description": "Proyecto del curso avanzado de backend con NodeJS",
   "main": "index.js",
   "scripts": {
+    "start": "concurrently \"npm run server1\" \"npm run server2\" \"npm run serve3\" ",
+    "server1": "node ./api/index.js",
+    "server2": "node ./mysql/index-mysql.js",
+    "serve3": "node ./post/index-post.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -22,6 +26,7 @@
     "express": "latest",
     "jsonwebtoken": "latest",
     "mysql": "latest",
+    "mysql2": "^3.6.5",
     "nanoid": "^2.1.7",
     "swagger-ui-express": "latest"
   },

@@ -1,4 +1,4 @@
-const mysql = require('mysql');
+const mysql = require('mysql2/promise');
 
 const config = require('../config');
 
@@ -7,72 +7,35 @@ const dbconf = {
     user: config.mysql.user,
     password: config.mysql.password,
     database: config.mysql.database,
-    port: config.mysql.port
+    port: config.mysql.port,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
 };
 
-let connection;
+let pool = mysql.createPool(dbconf);
 
-function handleCon() {
-    connection = mysql.createConnection(dbconf);
-
-    connection.connect((err) => {
-        if (err) {
-            console.error('[db err]', err);
-            setTimeout(handleCon, 2000);
-        } else {
-            console.log('DB Connected!');
-        }
-    });
-
-    connection.on('error', err => {
-        console.error('[db err]', err);
-        if (err.code === 'PROTOCOL_CONNECTION_LOST') {
-            handleCon();
-        } else {
-            throw err;
-        }
-    })
+async function list(table) {
+    const [rows] = await pool.query(`SELECT * FROM ${table}`);
+    return rows;
 }
 
-handleCon();
-
-function list(table) {
-    return new Promise( (resolve, reject) => {
-        connection.query(`SELECT * FROM ${table}`, (err, data) => {
-            if (err) return reject(err);
-            resolve(data);
-        })
-    })
+async function get(table, id) {
+    const [rows] = await pool.query(`SELECT * FROM ${table} WHERE id=${id}`);
+    return rows[0];
 }
 
-function get(table, id) {
-    return new Promise((resolve, reject) => {
-        connection.query(`SELECT * FROM ${table} WHERE id=${id}`, (err, data) => {
-            if (err) return reject(err);
-            resolve(data);
-        })
-    })
+async function insert(table, data) {
+    const [result] = await pool.query(`INSERT INTO ${table} SET ?`, data);
+    return result;
 }
 
-function insert(table, data) {
-    return new Promise((resolve, reject) => {
-        connection.query(`INSERT INTO ${table} SET ?`, data, (err, result) => {
-            if (err) return reject(err);
-            resolve(result);
-        })
-    })
+async function update(table, data) {
+    const [result] = await pool.query(`UPDATE ${table} SET ? WHERE id=?`, [data, data.id]);
+    return result;
 }
 
-function update(table, data) {
-    return new Promise((resolve, reject) => {
-        connection.query(`UPDATE ${table} SET ? WHERE id=?`, [data, data.id], (err, result) => {
-            if (err) return reject(err);
-            resolve(result);
-        })
-    })
-}
-
-function upsert(table, data) {
+async function upsert(table, data) {
     if (data && data.id) {
         return update(table, data);
     } else {
@@ -80,7 +43,7 @@ function upsert(table, data) {
     }
 }
 
-function query(table, query, join) {
+async function query(table, query, join) {
     let joinQuery = '';
     if (join) {
         const key = Object.keys(join)[0];
@@ -88,12 +51,8 @@ function query(table, query, join) {
         joinQuery = `JOIN ${key} ON ${table}.${val} = ${key}.id`;
     }
 
-    return new Promise((resolve, reject) => {
-        connection.query(`SELECT * FROM ${table} ${joinQuery} WHERE ${table}.?`, query, (err, res) => {
-            if (err) return reject(err);
-            resolve(res[0] || null);
-        })
-    })
+    const [rows] = await pool.query(`SELECT * FROM ${table} ${joinQuery} WHERE ${table}.?`, query);
+    return rows[0] || null;
 }
 
 module.exports = {

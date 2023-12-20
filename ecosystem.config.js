@@ -3,10 +3,9 @@ module.exports = {
       {
         name: 'API-MAIN',
         script: './api/index.js',
-        instances: 2,
+        instances: 1,
         autorestart: true,
         watch: false,
-        max_memory_restart: '2G',
         env: {
           NODE_ENV: 'development'
         },
@@ -17,10 +16,9 @@ module.exports = {
       {
         name: 'API-MYSQL',
         script: './mysql/index-mysql.js',
-        instances: 2,
+        instances: 1,
         autorestart: true,
         watch: false,
-        max_memory_restart: '2G',
         env: {
           NODE_ENV: 'development'
         },
@@ -31,10 +29,9 @@ module.exports = {
       {
         name: 'API-POST',
         script: './post/index-post.js',
-        instances: 2,
+        instances: 1,
         autorestart: true,
         watch: false,
-        max_memory_restart: '2G',
         env: {
           NODE_ENV: 'development'
         },

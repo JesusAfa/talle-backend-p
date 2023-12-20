@@ -18,7 +18,6 @@ router.put('/', secure('update'), upsert);
 function list(req, res, next) {
     Controller.list()
         .then((lista) => {
-            
             response.success(req, res, lista.data, 200);
         })
         .catch(next);
@@ -35,7 +34,7 @@ function get(req, res, next) {
 function upsert(req, res, next) {
     Controller.upsert(req.body)
         .then((user) => {
-            response.success(req, res, user, 201);
+            response.success(req, res, user.data, 201);
         })
         .catch(next);
 }
